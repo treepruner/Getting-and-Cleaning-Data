@@ -1,9 +1,9 @@
 # Getting-and-Cleaning-Data
 ##Course Project
 
-###Original file:
+Original file:
 - https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
-- 
+ 
 
 
 ###General plan
@@ -14,6 +14,8 @@
 - keep original field names as intact as possible 
 - write out with a "|" so that anyone with a text editor can tell the fields apart
 
+### Codebook
+- extracts from original data's README, features_info.txt plus my comments
 
 ###Code to read in table:  
 -temp <-read.table("tidy_narrow.txt", sep = "|")
