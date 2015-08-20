@@ -7,12 +7,12 @@ Original file:
 
 
 ###General plan
-- comment run_analysis.R as you go
-- read in intitial files with original names + 0
-- increment suffix by 1 for each major change
-- name new files as explicitly as possible
-- keep original field names as intact as possible 
-- write out with a "|" so that anyone with a text editor can tell the fields apart
+- read comments in  run_analysis.R as you go
+- intitial files read in with with original names + 0
+- files names suffix incremented by 1 for each major change
+- new files named as explicitly as possible
+- original field names kept as intact as possible 
+- final file wrote out with a "|" so that anyone with a text editor can tell the fields apart
 
 ### Codebook
 - extracts from original data's README, features_info.txt plus my comments
