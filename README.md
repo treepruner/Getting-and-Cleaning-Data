@@ -18,4 +18,4 @@ Original file:
 - extracts from original data's README, features_info.txt plus my comments
 
 ###Code to read in table:  
--temp <-read.table("tidy_narrow.txt", sep = "|")
+tidy_narrow <-read.table("tidy_narrow.txt", sep = "|")
