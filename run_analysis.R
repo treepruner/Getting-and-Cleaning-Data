@@ -251,6 +251,7 @@ temp <-read.table("tidy.txt"
 )  
 
 
+
 ### get stats for codebook
 dim(tidy) # [1] 180  69
 

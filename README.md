@@ -1,8 +1,5 @@
 ##Course Project
 
-Original file:
-- https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
-
 ###General plan
 - read comments in  run_analysis.R as you go
 - intitial files read in with with original names + 0
@@ -32,3 +29,7 @@ temp <-read.table("tidy.txt"
                                    ,"numeric","numeric","numeric","numeric","numeric","numeric"
                                    ,"numeric","numeric","numeric" )
 )  
+
+###Original file:
+- https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
+

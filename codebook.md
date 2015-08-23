@@ -1,6 +1,6 @@
 # GCD Course Project Codebook
 treepruner  
-August 19, 2015  
+August 22, 2015  
 
 # Project Description
 Getting and Cleaning Data course project takes files from
@@ -37,7 +37,7 @@ The codes in x_test.txt are match the codes in activity_labels.txt
 The training data sets work in a similar fashion.
 
 
-##Manipulation of the study data
+## Manipulation of the study data
 
 ### Step 0 - Download, Unzip and Read in files
 - files downloaded from "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip" 
@@ -874,7 +874,7 @@ The final tidy file is 180 rows and 69 columns. Here are the results of running 
 
 
 
-##Sources
+## Sources
 - http://stackoverflow.com/questions/7963898/extracting-the-last-n-characters-from-a-string-in-r
 - https://fishr.wordpress.com/2014/04/17/dplyr-example-1/
 - https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
