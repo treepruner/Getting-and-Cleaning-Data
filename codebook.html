@@ -73,7 +73,7 @@ img {
 <p>Getting and Cleaning Data course project takes files from <a href="https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip">https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip</a> and produces a tidy data by subject and activity of any original measurement fields with “mean” or “std” in their name.</p>
 <div id="project-design-and-data-processing" class="section level2">
 <h2>Project design and data processing</h2>
-<p>I first read the README and features_info.txt to get an overview of the data. Next I looked at the files in a text editor.</p>
+<p>I first read the README and features_info.txt to get an overview of the data. Next I looked at the files in a text editor. The text editor wasn’t helpful since you can’t tell where one field stops and another starts.</p>
 <p>Here are the row counts for the test data sets:</p>
 <table>
 <thead>
@@ -115,11 +115,29 @@ img {
 <td align="left">6</td>
 <td align="left">2</td>
 </tr>
+<tr class="even">
+<td align="left">X_train.txt</td>
+<td align="left">Train set data</td>
+<td align="left">7352</td>
+<td align="left">561</td>
+</tr>
+<tr class="odd">
+<td align="left">y_train.tt</td>
+<td align="left">Train set column labels</td>
+<td align="left">2947</td>
+<td align="left">1</td>
+</tr>
+<tr class="even">
+<td align="left">subject_train.txt</td>
+<td align="left">Train set subjects</td>
+<td align="left">7352</td>
+<td align="left">1</td>
+</tr>
 </tbody>
 </table>
 <p>The files are broken apart very strangely.</p>
 <p>The number of columns in X_test.txt matches the # rows in features.txt. I was able to confirm that features.txt contains the column headings for X_test.txt.</p>
-<p>The number of rows in subject_test.txt and y_test.txt match the # of rows in X_test.txt. I was able to confirm that these files have the subject and test information for each row in x_test.txt</p>
+<p>The number of rows in subject_test.txt and y_test.txt match the # of rows in X_test.txt. I was able to confirm that these files have the subject and activity test information for each row in x_test.txt</p>
 <p>The codes in x_test.txt are match the codes in activity_labels.txt</p>
 <p>The training data sets work in a similar fashion.</p>
 </div>
@@ -128,19 +146,25 @@ img {
 <div id="step-0---download-unzip-and-read-in-files" class="section level3">
 <h3>Step 0 - Download, Unzip and Read in files</h3>
 <ul>
+<li>files downloaded from “<a href="https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip">https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip</a>”</li>
 <li>initial read is given a suffix of 0</li>
 <li>suffix is incremented by 1 for each transformation</li>
 </ul>
 <div id="read-in-activity-features" class="section level4">
 <h4>read in activity, features</h4>
 <ul>
-<li>activity_labels as activity_cd and activity</li>
-<li>features as feature_cd and feature</li>
+<li>activity_labels.txt imported as as activity_cd and activity</li>
+<li>features.txt imported as feature_cd and feature</li>
+</ul>
+<div id="clean-features-using-stringr-package" class="section level5">
+<h5>clean features using stringr package</h5>
+<p>Features contains the column labels for the test and training datasets, but there are non-alphanumeric symbols and duplicate entries.</p>
+<ul>
+<li>convert “-” and “,” to “_&quot;</li>
+<li>remove “(” and “)”</li>
+<li>make unique by adding suffix of left 0 padded row numbers, e.g., _001, _002 and so on. These were stripped out later.</li>
 </ul>
 </div>
-<div id="clean-features-using-stringr-package" class="section level4">
-<h4>Clean features using stringr package</h4>
-<p>Features contains the column labels for the test and training datasets, but there are non-alphanumeric symbols and duplicate entries. - convert “-” and “,” to “_&quot; - remove trailing “()” - make unique by adding suffix of left 0 padded row numbers (these were stripped out later)</p>
 </div>
 <div id="read-in-testing-data-check-rows-add-existing-labels" class="section level4">
 <h4>read in testing data, check rows, add existing labels</h4>
@@ -185,7 +209,7 @@ img {
 <h3>Step 4 - Label the data set with descriptive variable names</h3>
 <ul>
 <li>save current column names</li>
-<li>alter to remove the _### required for uniqueness</li>
+<li>alter to remove the _### required for uniqueness by position</li>
 <li>fix the 3 without _### that got wrecked</li>
 <li>replace the column names</li>
 <li>check column names are still unique</li>
@@ -194,19 +218,19 @@ img {
 <div id="step---5-create-an-independent-tidy-data-set-with-average-of-each-variable-for-each-activity-and-each-subject" class="section level3">
 <h3>Step - 5 create an independent tidy data set with average of each variable for each activity and each subject</h3>
 <ul>
-<li>use dplyr’s “arrange” and “group_by” with “summarise_each” create a relatively narrow and long dataset.</li>
-<li>save out with a “|” for the delimiter</li>
+<li>use dplyr’s “arrange” and “group_by” with “summarise_each” create a dataset with one row per subject and activity. Note that the US spelling of summarize_each failed to run.</li>
+<li>save out with a “|” for the delimiter so the fields can be told apart in a text editor</li>
 </ul>
-<div id="code-to-read-file-back-in" class="section level4">
-<h4>Code to read file back in</h4>
-<p>temp &lt;-read.table(“tidy_narrow.txt”, sep = “|”)</p>
+<div id="code-to-read-it-back-in-set-column-classes" class="section level4">
+<h4>Code to read it back in &amp; set column classes</h4>
+<p>temp &lt;-read.table(“tidy.txt” , sep = “|” , header = TRUE , colClasses = c(“integer”, “factor”, “numeric”,“numeric”,“numeric”,“numeric” ,“numeric”,“numeric”,“numeric”,“numeric”,“numeric”,“numeric” ,“numeric”,“numeric”,“numeric”,“numeric”,“numeric”,“numeric” ,“numeric”,“numeric”,“numeric”,“numeric”,“numeric”,“numeric” ,“numeric”,“numeric”,“numeric”,“numeric”,“numeric”,“numeric” ,“numeric”,“numeric”,“numeric”,“numeric”,“numeric”,“numeric” ,“numeric”,“numeric”,“numeric”,“numeric”,“numeric”,“numeric” ,“numeric”,“numeric”,“numeric”,“numeric”,“numeric”,“numeric” ,“numeric”,“numeric”,“numeric”,“numeric”,“numeric”,“numeric” ,“numeric”,“numeric”,“numeric”,“numeric”,“numeric”,“numeric” ,“numeric”,“numeric”,“numeric”,“numeric”,“numeric”,“numeric” ,“numeric”,“numeric”,“numeric” ) )</p>
 </div>
 </div>
 </div>
 <div id="notes-on-the-original-study-data" class="section level2">
 <h2>Notes on the original (study) data</h2>
-<p>There were duplicate rows in the feature.txt file. It appears the original file was missing an X, Y or Z suffix on some entries. To preserve the original naming convention as much as possible, I worked around the bad entries by adding the row number to make them unique.</p>
-<p>Here are the non-unique entries in features.txt:</p>
+<p>There were duplicate rows in the feature.txt file. It appears the original file was missing an X, Y or Z suffix on some entries. To preserve the original naming convention as much as possible and avoid guessing, I worked around the bad entries by adding “_ + row number” to make them unique. The “_ + row number” was later stripped out.</p>
+<p>Here are the non-unique entries in features.txt and the number of occurances:</p>
 <table>
 <thead>
 <tr class="header">
@@ -386,8 +410,8 @@ img {
 </tbody>
 </table>
 </div>
-<div id="summary-statistics-of-the-tidy_narrow.txt-file" class="section level2">
-<h2>Summary statistics of the tidy_narrow.txt file</h2>
+<div id="summary-statistics-of-the-tidy.txt-file" class="section level2">
+<h2>Summary statistics of the tidy.txt file</h2>
 <table>
 <thead>
 <tr class="header">
@@ -2633,8 +2657,8 @@ img {
 </tbody>
 </table>
 </div>
-<div id="description-of-the-variables-in-the-tidy_narrow.txt-file" class="section level2">
-<h2>Description of the variables in the tidy_narrow.txt file</h2>
+<div id="description-of-the-variables-in-the-tidy.txt-file" class="section level2">
+<h2>Description of the variables in the tidy.txt file</h2>
 <div id="original-readme.txt-excerpts" class="section level4">
 <h4>Original README.txt excerpts</h4>
 <div id="each-record-provides" class="section level6">
@@ -2667,7 +2691,7 @@ img {
 <li><p>f prefix denotes frequency domain signals</p></li>
 <li><p>anything else was estimated from signal</p></li>
 </ul>
-<p>The file is 180 rows and 69 columns. Here are the results of running str() on it:</p>
+<p>The final tidy file is 180 rows and 69 columns. Here are the results of running str() on it:</p>
 <table>
 <thead>
 <tr class="header">

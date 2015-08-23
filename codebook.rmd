@@ -15,7 +15,7 @@ with "mean" or "std" in their name.
 
 
 ##Project design and data processing
-I first read the README and features_info.txt to get an overview of the data. Next I looked at the files in a text editor. 
+I first read the README and features_info.txt to get an overview of the data. Next I looked at the files in a text editor. The text editor wasn't helpful since you can't tell where one field stops and another starts.
 
 Here are the row counts for the test data sets:
 
@@ -26,12 +26,16 @@ Here are the row counts for the test data sets:
 | subject_test.txt    | Test set subjects                  |  2947     | 1 |
 | features.txt        | Test and Train column descriptions |  561      | 2 |
 | activity_labels.txt | Activity codes and labels          |  6        | 2 |
+| X_train.txt         | Train set data                     |  7352     |561|
+| y_train.tt          | Train set column labels            |  2947     | 1 |
+| subject_train.txt   | Train set subjects                 |  7352     | 1 |
+
 
 The files are broken apart very strangely. 
 
 The number of columns in X_test.txt matches the # rows in features.txt. I was able to confirm that features.txt contains the column headings for X_test.txt.
 
-The number of rows in subject_test.txt and y_test.txt match the # of rows in X_test.txt. I was able to confirm that these files have the subject and test information for each row in x_test.txt
+The number of rows in subject_test.txt and y_test.txt match the # of rows in X_test.txt. I was able to confirm that these files have the subject and activity test information for each row in x_test.txt
 
 The codes in x_test.txt are match the codes in activity_labels.txt
 
@@ -41,21 +45,22 @@ The training data sets work in a similar fashion.
 ##Manipulation of the study data
 
 ### Step 0 - Download, Unzip and Read in files
- 
+- files downloaded from "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip" 
 - initial read is given a suffix of 0
 - suffix is incremented by 1 for each transformation 
 
 
 
 #### read in activity, features 
-- activity_labels as activity_cd and activity
-- features as feature_cd and feature
+- activity_labels.txt imported as as activity_cd and activity
+- features.txt imported as feature_cd and feature
 
-#### Clean features using stringr package
+##### clean features using stringr package
 Features contains the column labels for the test and training datasets, but there are non-alphanumeric symbols and duplicate entries. 
+
 - convert "-"  and "," to "_"
-- remove trailing "()"
-- make unique by adding suffix of left 0 padded row numbers (these were stripped out later)
+- remove  "("  and ")"
+- make unique by adding suffix of left 0 padded row numbers, e.g., _001, _002 and so on. These were stripped out later.
 
 ####  read in testing data, check rows, add existing labels
 - initial file read in with suffix of 0 and all lower case
@@ -89,26 +94,41 @@ I was unable to combine in a single step... matches seemed to override exclusion
 - leave in the activity_cd on purpose
 
 
-###  Step 4 -  Label the data set with descriptive variable names                  
+### Step 4 -  Label the data set with descriptive variable names                  
 - save current column names
-- alter to remove the _### required for uniqueness
+- alter to remove the _### required for uniqueness by position
 - fix the 3 without _### that got wrecked
 - replace the column names
 - check column names are still unique
 
 ### Step - 5 create an independent tidy data set with average of each variable for each activity and each subject
-- use dplyr's "arrange" and "group_by" with "summarise_each" create a relatively narrow and long dataset.
-- save out with a "|" for the delimiter
+- use dplyr's "arrange" and "group_by" with "summarise_each" create a dataset with one row per subject and activity. Note that the US spelling of summarize_each failed to run.
+- save out with a "|" for the delimiter so the fields can be told apart in a text editor
 
 
-#### Code to read file back in
-temp <-read.table("tidy_narrow.txt", sep = "|")
+#### Code to read it back in & set column classes
+temp <-read.table("tidy.txt"
+       , sep = "|"
+       , header = TRUE
+       , colClasses = c("integer", "factor", "numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric" )
+)  
 
 
-##Notes on the original (study) data 
-There were duplicate rows in the feature.txt file. It appears the original file was missing an X, Y or Z suffix on some entries. To preserve the original naming convention as much as possible, I worked around the bad entries by adding the row number to make them unique.  
+## Notes on the original (study) data 
+There were duplicate rows in the feature.txt file. It appears the original file was missing an X, Y or Z suffix on some entries. To preserve the original naming convention as much as possible and avoid guessing, I worked around the bad entries by adding "_ + row number" to make them unique. The  "_ + row number" was later stripped out.
 
-Here are the non-unique entries in features.txt:
+Here are the non-unique entries in features.txt and the number of occurances:
 
 
 |       original entry           | x freq  |
@@ -159,7 +179,7 @@ Here are the non-unique entries in features.txt:
 
 
 
-##Summary statistics of the tidy_narrow.txt file
+##Summary statistics of the tidy.txt file
 |field          |summary stats    |
 |---------------|-----------------|
 |tBodyAcc_mean_X|Min.   :0.2216   |
@@ -756,7 +776,7 @@ Here are the non-unique entries in features.txt:
 
 
 
-##Description of the variables in the tidy_narrow.txt file
+##Description of the variables in the tidy.txt file
 
 #### Original README.txt excerpts
 
@@ -782,7 +802,7 @@ Here are the non-unique entries in features.txt:
 
 
 
-The file is 180 rows and 69 columns. Here are the results of running str() on it:
+The final tidy file is 180 rows and 69 columns. Here are the results of running str() on it:
 
  
 | column                     |type| valyes|

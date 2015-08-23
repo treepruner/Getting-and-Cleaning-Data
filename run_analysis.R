@@ -1,24 +1,21 @@
 # Getting and Cleaning Data Course Project
+# getdata-031
 
 # load likely packages
-
-
 library(tidyr)
 library(dplyr)
 library(stringr)
 
 
-
-# set dir, download and unzip
+### set dir, download and unzip
 rm(list = ls())
-#setwd("C:/Users/testsubject941/Documents/GitHub/getting-and-cleaning-data")
 if (!file.exists("./data")) { dir.create("data")} 
 setwd("./data")
 fileURL = "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
 download.file(fileURL, destfile = "projectFiles.zip", method = "auto")
 unzip(zipfile = "projectFiles.zip")
 
-# what do we have?
+#### what do we have?
 dir()
 setwd("./UCI HAR Dataset")
 fileListing <- list.files();fileListing 
@@ -26,28 +23,27 @@ fileListing <- list.files();fileListing
 ##########################################################################
 ### Step 0 - read in data  
 # 
-# initial read is given a suffix of 0
-# suffix is incremented by 1 for each transformation 
-#
-# see original README.txt and features_info.txt
-# 
-
-#####  For each record it is provided:
+#### initial read is given a suffix of 0
+#### suffix is incremented by 1 for each transformation 
+##
+#### From the original README.txt 
+####
+##### Forr each record it is provided:
 ##### Triaxial acceleration from the accelerometer (total acceleration) and the estimated body acceleration.
 ##### Triaxial Angular velocity from the gyroscope. 
 ##### A 561-feature vector with time and frequency domain variables. 
 ##### Its activity label. 
 ##### An identifier of the subject who carried out the experiment.
 
-
-#####               features
-#####t prefix denotes time domain signals, except for these that are averages
+#### From the original features_info.txt
+#####               
+##### t prefix denotes time domain signals, except for these that are averages
 #####      tBodyAccMean
 #####      tBodyAccJerkMean
 #####      tBodyGyroMean
 #####      tBodyGyroJerkMean
-#####f prefix denotes frequency domain signals
-#####anything else was estimated from signal
+##### f prefix denotes frequency domain signals
+##### anything else was estimated from signal
 
 ##########################################################################
 
@@ -57,7 +53,7 @@ activity_labels0 <- read.csv("activity_labels.txt"
                             , col.names = c("activity_cd", "activity"))
 
 
-####features0
+####features
 features0 <- read.csv("features.txt"
                      , sep = " ", header = FALSE
                      , col.names = c("feature_cd", "feature"))
@@ -67,8 +63,6 @@ features0 <- read.csv("features.txt"
 #####convert "-"  and "," to "_"
 #####remove trailing "()"
 #####make unique by adding suffix of left padded row numbers
-
-library(stringr)
 
 features1 <- features0  %>%  
         mutate(feature = str_replace_all(feature,  "[-,]", "_")) %>% 
@@ -91,7 +85,7 @@ colnames(subject_test0) <- "subject"
 colnames(y_test0) <- "activity_cd"
 
 
-# add subject and test columns to left side
+# add subject and test activity columns to left side
 x_test1 <- cbind(y_test0, x_test0)
 x_test2 <- cbind(subject_test0, x_test1)
 dim(x_test2) # [1] 2947  563
@@ -109,7 +103,7 @@ colnames(subject_train0) <- "subject"
 colnames(y_train0) <- "activity_cd"
 
 
-# add subject and test columns to left side
+# add subject and test activity columns to left side
 x_train1 <- cbind(y_train0, x_train0)
 x_train2 <- cbind(subject_train0, x_train1)
 dim(x_train2) # [1] 7352  563
@@ -190,12 +184,12 @@ rm(mean_std0, mean_std1, mean_std2)
 mean_std3_colNames0 <- as.data.frame(colnames(mean_std3))
 colnames(mean_std3_colNames0) = "activity"
 
-# remove the _#####required for uniqueness
+# remove the _### required for uniqueness
 # this should be done in one step using regex...
 mean_std3_colNames1 <- mean_std3_colNames0  %>%
         mutate(activity = str_sub(activity, end = -5  )) 
 
-# fix the 3 without _#####that got wrecked
+# fix the 3 without _#### that got wrecked...
 mean_std3_colNames1[1,1] = "activity_cd"
 mean_std3_colNames1[2,1] = "activity"
 mean_std3_colNames1[3,1] = "subject"
@@ -208,9 +202,9 @@ count(names(mean_std3))
 
 
 ####save so you can start over...
-setwd("C:/Users/testsubject941/Documents/Coursera/Getting and Cleaning Data/Course Project")
+setwd("..")
 save(mean_std3, file = "mean_std3.Rda")
-# load ("mean_std3.Rda")
+#load (mean_std3.Rda")
 
 # clean up environment
 rm(mean_std3_colNames0,  mean_std3_colNames1, activity_labels0, mean_std2)
@@ -218,47 +212,64 @@ rm(mean_std3_colNames0,  mean_std3_colNames1, activity_labels0, mean_std2)
 
 ##########################################################################
 ### Step 5 -  create an independent tidy data set with the                         #
-# average of each variable for each activity and each subject.           #
+### average of each variable for each activity and each subject.           #
 ##########################################################################
 
 
-# create relatively narrow and long dataset
-tidy_narrow <- mean_std3  %>%
+#### create relatively narrow and long dataset
+#### note that summarize_each did NOT run. I had to use the 'S' spelling
+tidy <- mean_std3  %>%
         arrange(subject, activity) %>%
         group_by(subject, activity) %>%
         summarise_each( funs(mean))
 
+
+
 # save out with a "|" for the delimiter
 # to perserve the ability to ID one field from another in a text editor
 setwd("..")
-write.table(tidy_narrow, file = "tidy_narrow.txt", sep = "|")
-
-# get stats for codebook
-dim(tidy_narrow) # [1] 180  69
-tidy_narrow_summary <- as.data.frame(summary(tidy_narrow))
-write.table(tidy_narrow_summary, file = "tidy_narrow_summary.txt", sep = "|")
-
-#### edit tidy_narrow_summary.txt in notepad++
-#### search and replace with regex
-#### remove garbage at beginning  ^[0-9]+[\|\|] 
-#### add a pipe at the end  search for $  and replace with \
-
-tidy_narrow_str <- str(tidy_narrow) 
-
-
-#### code to read it back in
-temp <-read.table("tidy_narrow.txt", sep = "|")
+write.table(tidy, file = "tidy.txt", sep = "|", row.name = FALSE)
 
 
 
-###### This isn't working yet...
+#### code to read it back in & set column classes
+temp <-read.table("tidy.txt"
+       , sep = "|"
+       , header = TRUE
+       , colClasses = c("integer", "factor", "numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric","numeric","numeric","numeric"
+                                   ,"numeric","numeric","numeric" )
+)  
 
-##### create wide and very short dataset
-tidy_wide <-  tidy_narrow %>%
-        spread(activity, tBodyAcc_mean_X) # rempved the 1 field and added 6 with activity names
+
+### get stats for codebook
+dim(tidy) # [1] 180  69
+
+#### Get the structure
+#### mystery on why this always stores null                  
+tidy_str <- str(tidy)
+str(tidy)
+
+#### Get the summary
+tidy_summary <- as.data.frame(summary(tidy))
+write.table(tidy_summary, file = "tidy_summary.txt", sep = "|")
+
+##### edit tidy_summary.txt in notepad++
+##### search and replace with regex
+##### remove garbage at beginning of each line with  ^[0-9]+[\|\|] 
+##### add a pipe at the end of each line by searching for $  and replace with \
 
 
-##### clean up environment
-rm(mean_std3, tidy_narrow)
+
+
 
 
