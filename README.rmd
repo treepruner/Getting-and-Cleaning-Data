@@ -1,4 +1,15 @@
 ---
+title: "README"
+author: "treepruner"
+date: "August 23, 2015"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+---
 title: "# Project README"
 author: "treepruner"
 date: "August 22, 2015"
@@ -38,9 +49,9 @@ The number of columns in X_test.txt matches the # rows in features.txt. I was ab
 
 The number of rows in subject_test.txt and y_test.txt match the # of rows in X_test.txt. I was able to confirm that these files have the subject and activity test information for each row in x_test.txt
 
-The codes in x_test.txt are match the codes in activity_labels.txt
+The codes in the rows of x_test.txt match the codes in activity_labels.txt
 
-The training data sets work in a similar fashion.
+The training datasets work in a similar fashion.
 
 
 ## Manipulation of the study data
@@ -55,9 +66,7 @@ The training data sets work in a similar fashion.
 - activity_labels.txt imported as as activity_cd and activity
 - features.txt imported as feature_cd and feature
 
-##### clean features files
-Features contains the column labels for the test and training datasets, but there are non-alphanumeric symbols and duplicate entries. 
-
+##### Clean features file. Features contains the column labels for the test and training datasets, but there are non-alphanumeric symbols and duplicate entries. 
 - convert "-"  and "," to "_"
 - remove  "("  and ")"
 - make unique by adding suffix of left 0 padded row numbers, e.g., _001, _002 and so on. These were stripped out later.
@@ -81,9 +90,8 @@ Combine testing and training rows into new data frame with rbind.
 
 
 ### Step 2 - Extract only the measurements on the mean and standard deviation 
-
-#### err on the side of including too many variables
 I was unable to combine in a single step... matches seemed to override exclusions, so these were done on multiple steps
+
 - take any fields containing any case of "mean" or "std"
 - remove columns related to the angle variable
 - remove columns related to the meanFreq, which is a summary measure
@@ -101,7 +109,7 @@ I was unable to combine in a single step... matches seemed to override exclusion
 - replace the column names
 - check column names are still unique
 
-### Step - 5 create an independent tidy data set with average of each variable for each activity and each subject
+### Step 5 - Create a tidy data set with average of each variable for each activity and subject
 - use dplyr's "arrange" and "group_by" with "summarise_each" to create a dataset with one row per subject and activity. Note that the US spelling of summarize_each failed to run.
 - save out with a "|" for the delimiter so the fields can be told apart in a text editor
 
@@ -127,7 +135,7 @@ temp <-read.table("tidy.txt"
 
 
 ## Sources
-http://stackoverflow.com/questions/7963898/extracting-the-last-n-characters-from-a-string-in-r
-https://fishr.wordpress.com/2014/04/17/dplyr-example-1/
-https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
-https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf
+- http://stackoverflow.com/questions/7963898/extracting-the-last-n-characters-from-a-string-in-r
+- https://fishr.wordpress.com/2014/04/17/dplyr-example-1/
+- https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
+- https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf
